@@ -50,17 +50,30 @@
           }
         }
 
-        // 3. Motherboard Hook
+        // 3. Motherboard Hook (保留厂商完整前缀，如 ASUSTeK COMPUTER INC. ROG ...)
         if (info.board) {
-          if (target.motherboard_vendor) info.board.vendor = target.motherboard_vendor;
-          if (target.motherboard_product) {
-            info.board.product = target.motherboard_product;
-            info.board.name = target.motherboard_product;
+          const v = (target.motherboard_vendor || info.board.vendor || '').trim();
+          const p = (target.motherboard_product || info.board.product || '').trim();
+          if (v) info.board.vendor = v;
+          if (p) info.board.product = p;
+
+          let fullBoard = p;
+          if (v && !p.toLowerCase().startsWith(v.toLowerCase())) {
+            fullBoard = `${v} ${p}`;
           }
+          info.board.name = fullBoard;
         }
         if (info.computer) {
-          if (target.motherboard_vendor) info.computer.vendor = target.motherboard_vendor;
-          if (target.motherboard_product) info.computer.model = target.motherboard_product;
+          const v = (target.motherboard_vendor || info.computer.vendor || '').trim();
+          const p = (target.motherboard_product || info.computer.model || '').trim();
+          if (v) info.computer.vendor = v;
+          if (p) {
+            let fullModel = p;
+            if (v && !p.toLowerCase().startsWith(v.toLowerCase())) {
+              fullModel = `${v} ${p}`;
+            }
+            info.computer.model = fullModel;
+          }
         }
 
         // 4. Memory Hook

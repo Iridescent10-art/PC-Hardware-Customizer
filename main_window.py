@@ -151,8 +151,10 @@ def load_config():
             ],
             "vram": ["48 GB", "32 GB", "24 GB", "16 GB", "12 GB (保持原始)", "8 GB"],
             "motherboard": [
+                {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG CROSSHAIR X870E DARK HERO"},
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG CROSSHAIR X870E HERO"},
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG MAXIMUS Z890 EXTREME"},
+                {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG STRIX Z790-H GAMING WIFI"},
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG STRIX X870-F GAMING WIFI"},
                 {"vendor": "Micro-Star International Co., Ltd.", "product": "MEG X870E GODLIKE"},
                 {"vendor": "Micro-Star International Co., Ltd.", "product": "MAG B650 TOMAHAWK WIFI"},
@@ -354,12 +356,16 @@ def execute_hardware_apply(target):
 
     # 4. BIOS
     try:
+        clean_product = board_product
+        if board_vendor and clean_product.lower().startswith(board_vendor.lower()):
+            clean_product = clean_product[len(board_vendor):].strip()
+
         bios_path = r"HARDWARE\DESCRIPTION\System\BIOS"
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, bios_path, 0, winreg.KEY_SET_VALUE) as k:
             winreg.SetValueEx(k, "BaseBoardManufacturer", 0, winreg.REG_SZ, board_vendor)
-            winreg.SetValueEx(k, "BaseBoardProduct", 0, winreg.REG_SZ, board_product)
+            winreg.SetValueEx(k, "BaseBoardProduct", 0, winreg.REG_SZ, clean_product)
             winreg.SetValueEx(k, "SystemManufacturer", 0, winreg.REG_SZ, board_vendor)
-            winreg.SetValueEx(k, "SystemProductName", 0, winreg.REG_SZ, board_product)
+            winreg.SetValueEx(k, "SystemProductName", 0, winreg.REG_SZ, clean_product)
     except Exception:
         pass
 
@@ -1589,7 +1595,10 @@ class MainWindow(QMainWindow):
         self.config["custom_target"]["motherboard_product"] = product
         save_config(self.config)
 
-        full_text = f"{vendor} {product}".strip()
+        if vendor and product.lower().startswith(vendor.lower()):
+            full_text = product
+        else:
+            full_text = f"{vendor} {product}".strip()
 
         if hasattr(self, "home_board_combo") and source != self.home_board_combo:
             self.home_board_combo.blockSignals(True)

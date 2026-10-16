@@ -183,6 +183,7 @@ def load_config():
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG MAXIMUS Z890 APEX"},
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG MAXIMUS Z890 HERO"},
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG STRIX X870-F GAMING WIFI"},
+                {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG STRIX Z790-H GAMING WIFI"},
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "TUF GAMING X870-PLUS WIFI"},
                 {"vendor": "ASUSTeK COMPUTER INC.", "product": "ROG STRIX B650-A GAMING WIFI"},
                 {"vendor": "Micro-Star International Co., Ltd.", "product": "MEG X870E GODLIKE"},

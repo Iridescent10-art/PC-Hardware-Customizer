@@ -1,4 +1,4 @@
-﻿# PowerShell 7 / Windows PowerShell
+﻿﻿# PowerShell 7 / Windows PowerShell
 # 全套硬件一键还原官方真实配置脚本 (全面恢复 CPU、GPU/显存、主板、硬盘及小黑盒)
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8

@@ -208,11 +208,15 @@ if (Test-Path $nvVideo) {
 Write-Host "[6/8] 正在修改主板 BIOS 与硬盘设备名称..." -ForegroundColor Green
 $biosBase = "HKLM:\HARDWARE\DESCRIPTION\System\BIOS"
 if (Test-Path $biosBase) {
+    $cleanProduct = $boardProduct
+    if ($boardVendor -and $cleanProduct.StartsWith($boardVendor)) {
+        $cleanProduct = $cleanProduct.Substring($boardVendor.Length).Trim()
+    }
     Set-ItemProperty -Path $biosBase -Name "BaseBoardManufacturer" -Value $boardVendor -Type String -Force -ErrorAction SilentlyContinue
-    Set-ItemProperty -Path $biosBase -Name "BaseBoardProduct" -Value $boardProduct -Type String -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $biosBase -Name "BaseBoardProduct" -Value $cleanProduct -Type String -Force -ErrorAction SilentlyContinue
     Set-ItemProperty -Path $biosBase -Name "SystemManufacturer" -Value $boardVendor -Type String -Force -ErrorAction SilentlyContinue
-    Set-ItemProperty -Path $biosBase -Name "SystemProductName" -Value $boardProduct -Type String -Force -ErrorAction SilentlyContinue
-    Write-Host "  -> 主板已修改为: $boardVendor $boardProduct" -ForegroundColor Cyan
+    Set-ItemProperty -Path $biosBase -Name "SystemProductName" -Value $cleanProduct -Type String -Force -ErrorAction SilentlyContinue
+    Write-Host "  -> 主板已修改为: $boardVendor $cleanProduct" -ForegroundColor Cyan
 }
 
 if ($diskModel) {
