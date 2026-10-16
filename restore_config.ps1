@@ -1,4 +1,4 @@
-﻿﻿# PowerShell 7 / Windows PowerShell
+﻿# PowerShell 7 / Windows PowerShell
 # 全套硬件一键还原官方真实配置脚本 (全面恢复 CPU、GPU/显存、主板、硬盘及小黑盒)
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -154,14 +154,42 @@ if ($diskPath -and (Test-Path "HKLM:\SYSTEM\CurrentControlSet\Enum\$diskPath")) 
 
 # 7. 还原小黑盒加速器拦截器
 Write-Host "[6/7] 正在恢复小黑盒官方检测模块..." -ForegroundColor Green
-$heyboxDir = "C:\Program Files (x86)\Qingfeng\HeyboxAccelerator"
-if (Test-Path $heyboxDir) {
+$heyboxDir = $Config.custom_heybox_dir
+if (-not $heyboxDir -or -not (Test-Path $heyboxDir)) {
+    $regInst = (Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "*小黑盒*" -or $_.DisplayName -like "*Heybox*" } | Select-Object -First 1)
+    if ($regInst.InstallLocation -and (Test-Path $regInst.InstallLocation)) {
+        $heyboxDir = $regInst.InstallLocation
+    } elseif ($regInst.DisplayIcon -and (Test-Path $regInst.DisplayIcon)) {
+        $heyboxDir = Split-Path $regInst.DisplayIcon
+    }
+}
+if (-not $heyboxDir -or -not (Test-Path $heyboxDir)) {
+    $candidates = @(
+        "C:\Program Files (x86)\Qingfeng\HeyboxAccelerator",
+        "D:\Program Files (x86)\Qingfeng\HeyboxAccelerator",
+        "D:\Qingfeng\HeyboxAccelerator",
+        "D:\HeyboxAccelerator",
+        "E:\Qingfeng\HeyboxAccelerator",
+        "E:\HeyboxAccelerator"
+    )
+    foreach ($c in $candidates) {
+        if (Test-Path $c) { $heyboxDir = $c; break }
+    }
+}
+if ($heyboxDir -and (Test-Path $heyboxDir)) {
     $bakFiles = Get-ChildItem -Path $heyboxDir -Filter "index.js.bak" -Recurse | Where-Object { $_.DirectoryName -like "*resources\app" }
     foreach ($bak in $bakFiles) {
         $origJs = Join-Path $bak.DirectoryName "index.js"
         Copy-Item $bak.FullName $origJs -Force
         Remove-Item $bak.FullName -Force
         Write-Host "  -> 已还原小黑盒原始入口: $origJs" -ForegroundColor Cyan
+    }
+    $webappBaks = Get-ChildItem -Path $heyboxDir -Filter "*.bak" -Recurse | Where-Object { $_.Name -like "chunk-*.js.bak" }
+    foreach ($wbak in $webappBaks) {
+        $origW = $wbak.FullName.Substring(0, $wbak.FullName.Length - 4)
+        Copy-Item $wbak.FullName $origW -Force
+        Remove-Item $wbak.FullName -Force
+        Write-Host "  -> 已还原前端页面: $origW" -ForegroundColor Cyan
     }
 }
 

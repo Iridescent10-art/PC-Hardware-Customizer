@@ -237,8 +237,35 @@ Write-Host "[7/8] 正在检查并更新小黑盒全套硬件拦截器及前端�
 $publicCfg = "C:\Users\Public\Hardware_Config.json"
 Copy-Item $ConfigFile $publicCfg -Force -ErrorAction SilentlyContinue
 
-$heyboxDir = "C:\Program Files (x86)\Qingfeng\HeyboxAccelerator"
-if (Test-Path $heyboxDir) {
+$heyboxDir = $target.custom_heybox_dir
+if (-not $heyboxDir -or -not (Test-Path $heyboxDir)) {
+    $heyboxDir = $Config.custom_heybox_dir
+}
+if (-not $heyboxDir -or -not (Test-Path $heyboxDir)) {
+    # 尝试从注册表自动读取
+    $regInst = (Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "*小黑盒*" -or $_.DisplayName -like "*Heybox*" } | Select-Object -First 1)
+    if ($regInst.InstallLocation -and (Test-Path $regInst.InstallLocation)) {
+        $heyboxDir = $regInst.InstallLocation
+    } elseif ($regInst.DisplayIcon -and (Test-Path $regInst.DisplayIcon)) {
+        $heyboxDir = Split-Path $regInst.DisplayIcon
+    }
+}
+if (-not $heyboxDir -or -not (Test-Path $heyboxDir)) {
+    $candidates = @(
+        "C:\Program Files (x86)\Qingfeng\HeyboxAccelerator",
+        "D:\Program Files (x86)\Qingfeng\HeyboxAccelerator",
+        "D:\Qingfeng\HeyboxAccelerator",
+        "D:\HeyboxAccelerator",
+        "E:\Qingfeng\HeyboxAccelerator",
+        "E:\HeyboxAccelerator"
+    )
+    foreach ($c in $candidates) {
+        if (Test-Path $c) { $heyboxDir = $c; break }
+    }
+}
+
+if ($heyboxDir -and (Test-Path $heyboxDir)) {
+    Write-Host "  -> 锁定小黑盒安装目录: $heyboxDir" -ForegroundColor Cyan
     $indexFiles = Get-ChildItem -Path $heyboxDir -Filter "index.js" -Recurse | Where-Object { $_.DirectoryName -like "*resources\app" }
     foreach ($idx in $indexFiles) {
         $bak = "$($idx.FullName).bak"
@@ -253,7 +280,7 @@ if (Test-Path $heyboxDir) {
     }
     $patchScript = Join-Path $ScriptDir "patch_webapp.py"
     if (Test-Path $patchScript) {
-        python $patchScript 2>$null | Out-Null
+        python $patchScript "$heyboxDir" 2>$null | Out-Null
         Write-Host "  -> 已应用小黑盒前端 UI 实时同步渲染补丁！" -ForegroundColor Cyan
     }
 }

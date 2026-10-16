@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox,
     QStackedWidget, QFrame, QScrollArea, QMessageBox, QGraphicsDropShadowEffect,
-    QInputDialog
+    QInputDialog, QFileDialog
 )
 
 # 基础目录与常量
@@ -191,9 +191,97 @@ def save_config(cfg):
         pass
 
 
-def get_xiaoheihe_index_paths():
-    base = r"C:\Program Files (x86)\Qingfeng\HeyboxAccelerator"
-    if not os.path.exists(base):
+def get_xiaoheihe_base_dir():
+    r"""
+    智能多级探测小黑盒安装根目录：
+    1. 用户自定义手动指定路径 (config.json 中的 custom_heybox_dir)
+    2. Windows 注册表 Uninstall 卸载项 (全盘/全盘符安装均有记录)
+    3. 当前运行中的小黑盒进程 (heyboxacc.exe / heybox.exe)
+    4. 全盘所有可用驱动器 (C:\, D:\, E:\, F:\ 等) 递归与常见目录扫描
+    5. 默认回退路径
+    """
+    # 1. 优先检查用户指定配置
+    try:
+        cfg = load_config()
+        custom_dir = cfg.get("custom_heybox_dir")
+        if custom_dir and os.path.isdir(custom_dir):
+            if os.path.exists(os.path.join(custom_dir, "heyboxacc.exe")) or os.path.exists(os.path.join(custom_dir, "resources")):
+                return custom_dir
+    except Exception:
+        pass
+
+    # 2. 检查 Windows 注册表卸载信息 (全版本/全路径/32位及64位均会在此注册)
+    uninstall_bases = [
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),
+        (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+    ]
+    for hkey, subkey_path in uninstall_bases:
+        try:
+            with winreg.OpenKey(hkey, subkey_path) as parent_key:
+                num_subkeys = winreg.QueryInfoKey(parent_key)[0]
+                for i in range(num_subkeys):
+                    try:
+                        k_name = winreg.EnumKey(parent_key, i)
+                        with winreg.OpenKey(parent_key, k_name) as app_key:
+                            try:
+                                d_name = winreg.QueryValueEx(app_key, "DisplayName")[0]
+                            except Exception:
+                                d_name = ""
+                            if "小黑盒" in d_name or "Heybox" in d_name:
+                                for val_name in ["InstallLocation", "DisplayIcon", "UninstallString"]:
+                                    try:
+                                        val = winreg.QueryValueEx(app_key, val_name)[0].strip().strip('"')
+                                        if os.path.isdir(val):
+                                            return val
+                                        elif os.path.exists(val):
+                                            d = os.path.dirname(val)
+                                            if os.path.isdir(d):
+                                                return d
+                                    except Exception:
+                                        pass
+                    except Exception:
+                        continue
+        except Exception:
+            continue
+
+    # 3. 检查当前是否正在运行小黑盒进程
+    try:
+        cmd = 'powershell -NoProfile -Command "(Get-Process -Name heyboxacc, heybox, HeyboxAccelerator -ErrorAction SilentlyContinue | Select-Object -First 1).Path"'
+        out = subprocess.check_output(cmd, shell=True, text=True, timeout=2).strip()
+        if out and os.path.exists(out):
+            p_dir = os.path.dirname(out)
+            if os.path.isdir(p_dir):
+                return p_dir
+    except Exception:
+        pass
+
+    # 4. 常见盘符遍历扫描
+    drives = [f"{chr(d)}:" for d in range(ord('C'), ord('Z') + 1) if os.path.exists(f"{chr(d)}:")]
+    sub_paths = [
+        r"Program Files (x86)\Qingfeng\HeyboxAccelerator",
+        r"Program Files\Qingfeng\HeyboxAccelerator",
+        r"Qingfeng\HeyboxAccelerator",
+        r"HeyboxAccelerator",
+        r"Heybox",
+        r"小黑盒加速器",
+        r"小黑盒",
+        r"Games\HeyboxAccelerator",
+        r"Software\HeyboxAccelerator",
+    ]
+    for d in drives:
+        for sp in sub_paths:
+            cand = os.path.join(d, os.sep, sp)
+            if os.path.isdir(cand) and (os.path.exists(os.path.join(cand, "heyboxacc.exe")) or os.path.exists(os.path.join(cand, "resources"))):
+                return cand
+
+    # 5. 回退到标准默认路径
+    return r"C:\Program Files (x86)\Qingfeng\HeyboxAccelerator"
+
+
+def get_xiaoheihe_index_paths(base_dir=None):
+    base = base_dir or get_xiaoheihe_base_dir()
+    if not base or not os.path.exists(base):
         return []
     paths = []
     for root, dirs, files in os.walk(base):
@@ -202,9 +290,9 @@ def get_xiaoheihe_index_paths():
     return paths
 
 
-def patch_xiaoheihe_webapp():
-    base = r"C:\Program Files (x86)\Qingfeng\HeyboxAccelerator"
-    if not os.path.exists(base):
+def patch_xiaoheihe_webapp(base_dir=None):
+    base = base_dir or get_xiaoheihe_base_dir()
+    if not base or not os.path.exists(base):
         return
     for root, dirs, files in os.walk(base):
         if "chunk-793bf638.0533358a.js" in files:
@@ -249,13 +337,13 @@ def patch_xiaoheihe_webapp():
                 pass
 
 
-def apply_xiaoheihe_hook():
+def apply_xiaoheihe_hook(base_dir=None):
     template_file = os.path.join(BASE_DIR, "xiaoheihe_index.js")
     if os.path.exists(template_file):
         with open(template_file, "r", encoding="utf-8") as tf:
             hook_full_content = tf.read()
 
-        for p in get_xiaoheihe_index_paths():
+        for p in get_xiaoheihe_index_paths(base_dir):
             try:
                 bak = p + ".bak"
                 if not os.path.exists(bak):
@@ -269,11 +357,11 @@ def apply_xiaoheihe_hook():
             except Exception:
                 pass
 
-    patch_xiaoheihe_webapp()
+    patch_xiaoheihe_webapp(base_dir)
 
 
-def restore_xiaoheihe_hook():
-    for p in get_xiaoheihe_index_paths():
+def restore_xiaoheihe_hook(base_dir=None):
+    for p in get_xiaoheihe_index_paths(base_dir):
         try:
             bak = p + ".bak"
             if os.path.exists(bak):
@@ -285,7 +373,7 @@ def restore_xiaoheihe_hook():
         except Exception:
             pass
 
-    base = r"C:\Program Files (x86)\Qingfeng\HeyboxAccelerator"
+    base = base_dir or get_xiaoheihe_base_dir()
     if os.path.exists(base):
         for root, dirs, files in os.walk(base):
             for fn in ["chunk-793bf638.0533358a.js", "chunk-499402f5.29a05416.js"]:
@@ -388,7 +476,7 @@ def execute_hardware_apply(target):
         pass
 
     # 6. Apply Xiaoheihe Hook
-    apply_xiaoheihe_hook()
+    apply_xiaoheihe_hook(target.get("custom_heybox_dir"))
 
     # 7. Startup fix task
     task_name = "CPU_Model_Fix_On_Startup"
@@ -700,11 +788,23 @@ QComboBox QAbstractItemView::item {
     padding: 2px 8px;
 }
 
-/* 自定义输入弹窗样式 (QInputDialog) */
-QDialog {
+/* 自定义消息弹窗与通用对话框样式 (QMessageBox & QDialog) */
+QDialog, QMessageBox {
     background-color: #FFFFFF;
     border: 1px solid #D6E6FE;
     border-radius: 12px;
+}
+
+QDialog QLabel, QMessageBox QLabel {
+    color: #1E293B;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+QMessageBox QLabel#qt_msgbox_label {
+    color: #1E293B;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 QInputDialog QLabel {
@@ -716,20 +816,21 @@ QInputDialog QLabel {
 QInputDialog QLineEdit {
     min-width: 400px;
     font-size: 13px;
+    color: #1E293B;
 }
 
-QDialogButtonBox QPushButton {
+QDialogButtonBox QPushButton, QMessageBox QPushButton {
     background-color: #2B85FF;
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
-    padding: 6px 18px;
+    padding: 7px 20px;
     font-size: 13px;
     font-weight: 600;
-    min-width: 60px;
+    min-width: 70px;
 }
 
-QDialogButtonBox QPushButton:hover {
+QDialogButtonBox QPushButton:hover, QMessageBox QPushButton:hover {
     background-color: #1D70E6;
 }
 
@@ -1474,9 +1575,42 @@ class MainWindow(QMainWindow):
         desc.setStyleSheet("color: #475569; font-size: 13px; line-height: 1.6;")
         c_layout.addWidget(desc)
 
-        status_lbl = QLabel("当前拦截器状态：已注入 (Hooked & Patched)")
-        status_lbl.setStyleSheet("color: #059669; font-weight: 700; background-color: #ECFDF5; border-radius: 8px; padding: 10px;")
-        c_layout.addWidget(status_lbl)
+        # 路径探测与自定义配置区域 (支持跨盘符全盘自动探测与手动浏览选择)
+        path_box = QVBoxLayout()
+        path_box.setSpacing(8)
+
+        path_title_row = QHBoxLayout()
+        path_title = QLabel("小黑盒加速器安装根目录 (支持跨盘符全盘自动探测，或点击浏览手动指定):")
+        path_title.setStyleSheet("color: #1E293B; font-size: 13px; font-weight: 600;")
+        path_title_row.addWidget(path_title)
+        path_title_row.addStretch()
+        path_box.addLayout(path_title_row)
+
+        curr_detected_path = get_xiaoheihe_base_dir()
+        path_input_row = QHBoxLayout()
+        path_input_row.setSpacing(10)
+
+        self.heybox_path_input = QLineEdit(curr_detected_path)
+        self.heybox_path_input.setPlaceholderText("请输入或浏览选择小黑盒加速器根目录 (包含 heyboxacc.exe 的文件夹)...")
+        self.heybox_path_input.textChanged.connect(self.on_heybox_path_changed)
+        path_input_row.addWidget(self.heybox_path_input, 1)
+
+        btn_browse = QPushButton("📂 浏览路径...")
+        btn_browse.setStyleSheet("background-color: #F1F5F9; color: #1E293B; border: 1px solid #CBD5E1; border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 600;")
+        btn_browse.clicked.connect(self.browse_heybox_path)
+        path_input_row.addWidget(btn_browse)
+
+        btn_redetect = QPushButton("🔍 重新探测")
+        btn_redetect.setStyleSheet("background-color: #F1F5F9; color: #1E293B; border: 1px solid #CBD5E1; border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 600;")
+        btn_redetect.clicked.connect(self.redetect_heybox_path)
+        path_input_row.addWidget(btn_redetect)
+
+        path_box.addLayout(path_input_row)
+
+        self.heybox_path_status = QLabel()
+        self.update_heybox_path_status_ui(curr_detected_path)
+        path_box.addWidget(self.heybox_path_status)
+        c_layout.addLayout(path_box)
 
         btn_box = QHBoxLayout()
         btn_inject = QPushButton("重新刷新注入拦截器")
@@ -1912,7 +2046,55 @@ class MainWindow(QMainWindow):
             self.config["custom_target"]["memory_clock_mhz"] = int(m.group(1))
             save_config(self.config)
 
+    def update_heybox_path_status_ui(self, p):
+        if not hasattr(self, "heybox_path_status"):
+            return
+        if not p or not os.path.exists(p):
+            self.heybox_path_status.setText("● 提示：指定目录不存在，请点击右侧“浏览路径”选择小黑盒加速器文件夹")
+            self.heybox_path_status.setStyleSheet("color: #D97706; background-color: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+            return
+        # 验证核心标志物
+        has_exe = os.path.exists(os.path.join(p, "heyboxacc.exe"))
+        has_res = os.path.exists(os.path.join(p, "resources"))
+        index_paths = get_xiaoheihe_index_paths(p)
+        if has_exe or has_res or len(index_paths) > 0:
+            count = len(index_paths)
+            self.heybox_path_status.setText(f"● 路径有效：已成功识别小黑盒核心模块 (找到 {count} 个 Electron 拦截入口节点)")
+            self.heybox_path_status.setStyleSheet("color: #059669; background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+        else:
+            self.heybox_path_status.setText("● 警告：该目录下未找到 heyboxacc.exe 或 resources 文件夹，请选择包含主程序的根目录")
+            self.heybox_path_status.setStyleSheet("color: #DC2626; background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+
+    def on_heybox_path_changed(self, text):
+        p = text.strip()
+        self.config["custom_heybox_dir"] = p
+        self.config["custom_target"]["custom_heybox_dir"] = p
+        save_config(self.config)
+        self.update_heybox_path_status_ui(p)
+
+    def browse_heybox_path(self):
+        curr = self.heybox_path_input.text().strip() if hasattr(self, "heybox_path_input") else ""
+        if not os.path.exists(curr):
+            curr = "C:\\"
+        selected = QFileDialog.getExistingDirectory(self, "选择小黑盒加速器安装根目录 (包含 heyboxacc.exe 的文件夹)", curr)
+        if selected:
+            selected = os.path.normpath(selected)
+            self.heybox_path_input.setText(selected)
+
+    def redetect_heybox_path(self):
+        if "custom_heybox_dir" in self.config:
+            del self.config["custom_heybox_dir"]
+        if "custom_heybox_dir" in self.config.get("custom_target", {}):
+            del self.config["custom_target"]["custom_heybox_dir"]
+        save_config(self.config)
+        detected = get_xiaoheihe_base_dir()
+        self.heybox_path_input.setText(detected)
+        QMessageBox.information(self, "探测完成", f"已重新自动探测到小黑盒根目录：\n\n{detected}")
+
     def on_apply_clicked(self):
+        h_dir = self.heybox_path_input.text().strip() if hasattr(self, "heybox_path_input") else get_xiaoheihe_base_dir()
+        self.config["custom_heybox_dir"] = h_dir
+        self.config["custom_target"]["custom_heybox_dir"] = h_dir
         save_config(self.config)
         execute_hardware_apply(self.config["custom_target"])
         QMessageBox.information(
@@ -1949,11 +2131,13 @@ class MainWindow(QMainWindow):
             )
 
     def on_refresh_hook(self):
-        apply_xiaoheihe_hook()
+        p = self.heybox_path_input.text().strip() if hasattr(self, "heybox_path_input") else get_xiaoheihe_base_dir()
+        apply_xiaoheihe_hook(p)
         QMessageBox.information(self, "完成", "小黑盒拦截器与前端渲染补丁已成功更新！")
 
     def on_restore_hook_only(self):
-        restore_xiaoheihe_hook()
+        p = self.heybox_path_input.text().strip() if hasattr(self, "heybox_path_input") else get_xiaoheihe_base_dir()
+        restore_xiaoheihe_hook(p)
         QMessageBox.information(self, "完成", "小黑盒原始入口文件与前端代码已恢复官方状态！")
 
 
