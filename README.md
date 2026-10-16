@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Nova Hardware Master (全套硬件配置自定义大师)
+# ⚡ DM Hardware Master (全套硬件配置自定义大师)
 
 **深度定制与伪装 Windows 系统全套核心硬件信息的现代化桌面工具**
 
@@ -11,7 +11,7 @@
 
 <br/>
 
-<img src="assets/preview.png" alt="Nova Hardware Master UI Preview" width="850" />
+<img src="assets/preview.png" alt="DM Hardware Master UI Preview" width="850" />
 
 </div>
 
@@ -19,7 +19,7 @@
 
 ## 💡 简介 (Overview)
 
-**Nova Hardware Master** 是一款采用 Fluent Design 现代化毛玻璃设计风格的全套硬件配置管理工具。支持对 **CPU 处理器、独立显卡/显存、主板 BIOS、内存 (RAM) 以及固态硬盘 (SSD)** 的深度自定义与伪装。
+**DM Hardware Master** 是一款采用 Fluent Design 现代化毛玻璃设计风格的全套硬件配置管理工具。支持对 **CPU 处理器、独立显卡/显存、主板 BIOS、内存 (RAM) 以及固态硬盘 (SSD)** 的深度自定义与伪装。
 
 具备注册表底层劫持、DirectX/DXGI 驱动描述重构、ACPI 核心枚举与 Electron / N-API 内存 Hook 等多层拦截技术，可无缝突破任务管理器、DirectX/DXGI 适配器、设备管理器及小黑盒加速器等硬件检测。
 

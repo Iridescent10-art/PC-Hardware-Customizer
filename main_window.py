@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Nova Hardware Master - 全硬件配置大师
+DM Hardware Master - 全硬件配置大师
 现代化极简卡片轻量风格 (Light Modern Card Theme)
 完全重构与视觉升级
 """
@@ -836,7 +836,7 @@ class MainWindow(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle("Nova Hardware Master - 全硬件配置大师")
+        self.setWindowTitle("DM Hardware Master - 全硬件配置大师")
         self.resize(1080, 720)
         self.setMinimumSize(960, 640)
 
@@ -932,7 +932,7 @@ class MainWindow(QMainWindow):
 
         title_vbox = QVBoxLayout()
         title_vbox.setSpacing(2)
-        brand_title = QLabel("Nova Hardware")
+        brand_title = QLabel("DM Hardware")
         brand_title.setObjectName("BrandTitle")
         brand_sub = QLabel("全硬件配置大师")
         brand_sub.setObjectName("BrandSubtitle")
@@ -1076,7 +1076,7 @@ class MainWindow(QMainWindow):
         text_vbox.setSpacing(8)
         
         title_box = QHBoxLayout()
-        t1 = QLabel("Nova")
+        t1 = QLabel("DM")
         t1.setObjectName("HeroTitleMain")
         t2 = QLabel("Hardware Master")
         t2.setObjectName("HeroTitleSub")
@@ -1685,7 +1685,7 @@ def main():
 
     # 外部与任务栏图标关联 (Windows AppID)
     try:
-        myappid = "NovaHardware.Master.Customizer.2.5"
+        myappid = "DMHardware.Master.Customizer.2.5"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     except Exception:
         pass
