@@ -18,7 +18,7 @@
     "gpu_vram_gb": 32,
     "target_gpu_instance_path": "PCI\\VEN_10DE&DEV_2786&SUBSYS_12017377&REV_A1\\4&D0BDF66&0&0009",
     "motherboard_vendor": "ASUSTeK COMPUTER INC.",
-    "motherboard_product": "ASUSTeK COMPUTER INC. ROG CROSSHAIR X870E DARK HERO",
+    "motherboard_product": "ROG CROSSHAIR X870E HERO",
     "memory_vendor": "Asgard",
     "memory_size_gb": 64,
     "memory_clock_mhz": 6400,
