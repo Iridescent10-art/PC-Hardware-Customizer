@@ -121,6 +121,9 @@ def load_config():
         },
         "presets": {
             "cpu": [
+                "AMD Ryzen 9 9950X3D2 16-Core Processor",
+                "AMD Ryzen 9 9950X3D 16-Core Processor",
+                "AMD Ryzen 7 9850X3D 8-Core Processor",
                 "AMD Ryzen 7 9800X3D 8-Core Processor",
                 "AMD Ryzen 9 9950X 16-Core Processor",
                 "AMD Ryzen 9 9900X 12-Core Processor",

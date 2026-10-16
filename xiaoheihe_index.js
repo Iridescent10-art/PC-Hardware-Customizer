@@ -38,7 +38,15 @@
           if (target.cpu_model) {
             info.cpu.name = target.cpu_model;
             const coreMatch = target.cpu_model.match(/(\d+)-Core/i);
-            if (coreMatch) info.cpu.cores = parseInt(coreMatch[1], 10);
+            if (coreMatch) {
+              info.cpu.cores = parseInt(coreMatch[1], 10);
+            } else if (/9950|7950|14900|13900|285K/i.test(target.cpu_model)) {
+              info.cpu.cores = 16;
+            } else if (/9850|9800|7800|9700|14700|265K/i.test(target.cpu_model)) {
+              info.cpu.cores = 8;
+            } else if (/9600|7600|14600|245K/i.test(target.cpu_model)) {
+              info.cpu.cores = 6;
+            }
           }
         }
 
