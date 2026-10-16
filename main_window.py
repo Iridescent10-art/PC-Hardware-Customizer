@@ -16,7 +16,8 @@ from PySide6.QtGui import QIcon, QPixmap, QFont, QColor
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox,
-    QStackedWidget, QFrame, QScrollArea, QMessageBox, QGraphicsDropShadowEffect
+    QStackedWidget, QFrame, QScrollArea, QMessageBox, QGraphicsDropShadowEffect,
+    QInputDialog
 )
 
 # 基础目录与常量
@@ -694,6 +695,44 @@ QComboBox QAbstractItemView {
     padding: 4px;
 }
 
+QComboBox QAbstractItemView::item {
+    min-height: 28px;
+    padding: 2px 8px;
+}
+
+/* 自定义输入弹窗样式 (QInputDialog) */
+QDialog {
+    background-color: #FFFFFF;
+    border: 1px solid #D6E6FE;
+    border-radius: 12px;
+}
+
+QInputDialog QLabel {
+    color: #1E293B;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QInputDialog QLineEdit {
+    min-width: 400px;
+    font-size: 13px;
+}
+
+QDialogButtonBox QPushButton {
+    background-color: #2B85FF;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 60px;
+}
+
+QDialogButtonBox QPushButton:hover {
+    background-color: #1D70E6;
+}
+
 /* 输入框 */
 QLineEdit {
     background-color: #F8FAFC;
@@ -1124,8 +1163,8 @@ class MainWindow(QMainWindow):
             badge_class="CardBadgeBlue", badge_char="C",
             title="处理器 CPU 定制", subtitle="核心数/频率/型号全面深度修改",
             action_text="配置处理器 →", action_class="CardActionBlue",
-            combo_items=self.config["presets"]["cpu"],
-            current_value=self.config["custom_target"].get("cpu_model", "AMD Ryzen 7 9800X3D 8-Core Processor"),
+            combo_items=list(self.config["presets"]["cpu"]) + ["✏️ 自定义 CPU 型号..."],
+            current_value=self.config["custom_target"].get("cpu_model", "AMD Ryzen 9 9950X3D2 16-Core Processor"),
             on_change=lambda text: self.sync_cpu(text, source=self.home_cpu_combo),
             on_click=lambda: self.switch_page(1)
         )
@@ -1138,7 +1177,7 @@ class MainWindow(QMainWindow):
             badge_class="CardBadgeOrange", badge_char="M",
             title="主板与内存", subtitle="ROG/微星主板 & 海盗船/芝奇 DDR5 高频内存",
             action_text="配置主板内存 →", action_class="CardActionOrange",
-            combo_items=board_presets,
+            combo_items=board_presets + ["✏️ 自定义主板型号..."],
             current_value=curr_board,
             on_change=lambda text: self.on_board_combo_selected(text, source=self.home_board_combo),
             on_click=lambda: self.switch_page(3)
@@ -1155,8 +1194,8 @@ class MainWindow(QMainWindow):
             badge_class="CardBadgePurple", badge_char="G",
             title="显卡 GPU & 显存", subtitle="RTX 5090/5080/4090 与最大 48GB 显存",
             action_text="配置显卡显存 →", action_class="CardActionPurple",
-            combo_items=self.config["presets"]["gpu"],
-            current_value=self.config["custom_target"].get("gpu_model", "NVIDIA GeForce RTX 5090 D"),
+            combo_items=list(self.config["presets"]["gpu"]) + ["✏️ 自定义 GPU 型号..."],
+            current_value=self.config["custom_target"].get("gpu_model", "NVIDIA GeForce RTX 5090"),
             on_change=lambda text: self.sync_gpu(text, source=self.home_gpu_combo),
             on_click=lambda: self.switch_page(2)
         )
@@ -1167,7 +1206,7 @@ class MainWindow(QMainWindow):
             badge_class="CardBadgeTeal", badge_char="D",
             title="硬盘存储定制", subtitle="三星 990 PRO 2TB / 致态 TiPro7000 等高速 NVMe",
             action_text="配置硬盘存储 →", action_class="CardActionTeal",
-            combo_items=self.config["presets"]["disk"],
+            combo_items=list(self.config["presets"]["disk"]) + ["✏️ 自定义硬盘型号..."],
             current_value=self.config["custom_target"].get("disk_model", "Samsung SSD 990 PRO 2TB"),
             on_change=lambda text: self.sync_disk(text, source=self.home_disk_combo),
             on_click=lambda: self.switch_page(4)
@@ -1248,7 +1287,7 @@ class MainWindow(QMainWindow):
         c_layout.addWidget(QLabel("选择或输入目标 CPU 型号 (修改所有逻辑核心 CentralProcessor 及 ACPI 注册表):"))
         self.cpu_sub_combo = QComboBox()
         self.cpu_sub_combo.setEditable(True)
-        self.cpu_sub_combo.addItems(self.config["presets"]["cpu"])
+        self.cpu_sub_combo.addItems(list(self.config["presets"]["cpu"]) + ["✏️ 自定义 CPU 型号..."])
         self.cpu_sub_combo.setCurrentText(self.config["custom_target"].get("cpu_model", "AMD Ryzen 7 9800X3D 8-Core Processor"))
         self.cpu_sub_combo.currentTextChanged.connect(lambda val: self.sync_cpu(val, source=self.cpu_sub_combo))
         c_layout.addWidget(self.cpu_sub_combo)
@@ -1281,14 +1320,15 @@ class MainWindow(QMainWindow):
         c_layout.addWidget(QLabel("目标 GPU 显卡型号 (修改 DirectX/DXGI/Enum 显卡参数与任务管理器显示):"))
         self.gpu_sub_combo = QComboBox()
         self.gpu_sub_combo.setEditable(True)
-        self.gpu_sub_combo.addItems(self.config["presets"]["gpu"])
+        self.gpu_sub_combo.addItems(list(self.config["presets"]["gpu"]) + ["✏️ 自定义 GPU 型号..."])
         self.gpu_sub_combo.setCurrentText(self.config["custom_target"].get("gpu_model", "NVIDIA GeForce RTX 5090 D"))
         self.gpu_sub_combo.currentTextChanged.connect(lambda val: self.sync_gpu(val, source=self.gpu_sub_combo))
         c_layout.addWidget(self.gpu_sub_combo)
 
         c_layout.addWidget(QLabel("目标独立显存容量 (DirectX / DXGI / 任务管理器 DedicatedVideoMemory):"))
         self.vram_sub_combo = QComboBox()
-        self.vram_sub_combo.addItems(self.config["presets"]["vram"])
+        self.vram_sub_combo.setEditable(True)
+        self.vram_sub_combo.addItems(list(self.config["presets"]["vram"]) + ["✏️ 自定义显存容量..."])
         curr_vram = f"{self.config['custom_target'].get('gpu_vram_gb', 24)} GB"
         for idx in range(self.vram_sub_combo.count()):
             if curr_vram in self.vram_sub_combo.itemText(idx):
@@ -1327,7 +1367,7 @@ class MainWindow(QMainWindow):
         curr_board = f"{self.config['custom_target'].get('motherboard_vendor', '')} {self.config['custom_target'].get('motherboard_product', '')}".strip()
         self.board_sub_combo = QComboBox()
         self.board_sub_combo.setEditable(True)
-        self.board_sub_combo.addItems(board_presets)
+        self.board_sub_combo.addItems(board_presets + ["✏️ 自定义主板型号..."])
         self.board_sub_combo.setCurrentText(curr_board)
         self.board_sub_combo.currentTextChanged.connect(lambda val: self.on_board_combo_selected(val, source=self.board_sub_combo))
         c_layout.addWidget(self.board_sub_combo)
@@ -1344,15 +1384,17 @@ class MainWindow(QMainWindow):
 
         c_layout.addWidget(QLabel("内存颗粒厂商 / 品牌:"))
         self.mem_vendor_input = QComboBox()
-        self.mem_vendor_input.addItems(self.config["presets"]["memory_vendor"])
+        self.mem_vendor_input.setEditable(True)
+        self.mem_vendor_input.addItems(list(self.config["presets"]["memory_vendor"]) + ["✏️ 自定义内存品牌..."])
         self.mem_vendor_input.setCurrentText(self.config["custom_target"].get("memory_vendor", "Corsair"))
-        self.mem_vendor_input.currentTextChanged.connect(lambda v: self.update_target_field("memory_vendor", v))
+        self.mem_vendor_input.currentTextChanged.connect(self.on_mem_vendor_changed)
         c_layout.addWidget(self.mem_vendor_input)
 
         c_layout.addWidget(QLabel("内存容量与工作频率 (DDR5):"))
         mem_h = QHBoxLayout()
         self.mem_size_input = QComboBox()
-        self.mem_size_input.addItems(self.config["presets"]["memory_size"])
+        self.mem_size_input.setEditable(True)
+        self.mem_size_input.addItems(list(self.config["presets"]["memory_size"]) + ["✏️ 自定义内存容量..."])
         curr_mem_s = f"{self.config['custom_target'].get('memory_size_gb', 64)} GB"
         for i in range(self.mem_size_input.count()):
             if curr_mem_s in self.mem_size_input.itemText(i):
@@ -1361,7 +1403,8 @@ class MainWindow(QMainWindow):
         self.mem_size_input.currentTextChanged.connect(self.on_mem_size_changed)
 
         self.mem_clock_input = QComboBox()
-        self.mem_clock_input.addItems(self.config["presets"]["memory_clock"])
+        self.mem_clock_input.setEditable(True)
+        self.mem_clock_input.addItems(list(self.config["presets"]["memory_clock"]) + ["✏️ 自定义工作频率..."])
         self.mem_clock_input.setCurrentText(f"{self.config['custom_target'].get('memory_clock_mhz', 7200)} MHz")
         self.mem_clock_input.currentTextChanged.connect(self.on_mem_clock_changed)
 
@@ -1392,7 +1435,7 @@ class MainWindow(QMainWindow):
         c_layout.addWidget(QLabel("选择或输入目标硬盘型号 (SCSI FriendlyName & 小黑盒底层探测):"))
         self.disk_sub_combo = QComboBox()
         self.disk_sub_combo.setEditable(True)
-        self.disk_sub_combo.addItems(self.config["presets"]["disk"])
+        self.disk_sub_combo.addItems(list(self.config["presets"]["disk"]) + ["✏️ 自定义硬盘型号..."])
         self.disk_sub_combo.setCurrentText(self.config["custom_target"].get("disk_model", "Samsung SSD 990 PRO 2TB"))
         self.disk_sub_combo.currentTextChanged.connect(lambda v: self.sync_disk(v, source=self.disk_sub_combo))
         c_layout.addWidget(self.disk_sub_combo)
@@ -1501,11 +1544,64 @@ class MainWindow(QMainWindow):
         self.config["custom_target"][key] = value
         save_config(self.config)
 
+    def _insert_combo_item(self, combo, text, preset_key=None):
+        """在自定义选项之前插入新项并避免重复，并可选择持久化到 presets"""
+        if not combo or not text:
+            return
+        text = str(text).strip()
+        found = False
+        for i in range(combo.count()):
+            if combo.itemText(i) == text:
+                found = True
+                break
+        if not found:
+            custom_idx = combo.count()
+            for i in range(combo.count()):
+                if combo.itemText(i).startswith("✏️ 自定义"):
+                    custom_idx = i
+                    break
+            combo.insertItem(custom_idx, text)
+
+        if preset_key and preset_key in self.config.get("presets", {}):
+            preset_list = self.config["presets"][preset_key]
+            if isinstance(preset_list, list) and text not in preset_list:
+                preset_list.append(text)
+                save_config(self.config)
+
+    def _revert_combo(self, combo, fallback_val):
+        """恢复下拉框选项，不触发多余事件"""
+        if not combo or not fallback_val:
+            return
+        combo.blockSignals(True)
+        idx = combo.findText(str(fallback_val).strip())
+        if idx >= 0:
+            combo.setCurrentIndex(idx)
+        else:
+            combo.setCurrentText(str(fallback_val).strip())
+        combo.blockSignals(False)
+
     def sync_cpu(self, val, source=None):
         if self._syncing or not val:
             return
-        self._syncing = True
         val = str(val).strip()
+
+        if val.startswith("✏️ 自定义"):
+            curr = self.config["custom_target"].get("cpu_model", "AMD Ryzen 7 9800X3D 8-Core Processor")
+            new_text, ok = QInputDialog.getText(self, "自定义 CPU 处理器型号", "请输入自定义的 CPU 完整型号名称:", text=curr)
+            if ok and new_text.strip():
+                val = new_text.strip()
+                if hasattr(self, "home_cpu_combo"):
+                    self._insert_combo_item(self.home_cpu_combo, val, preset_key="cpu")
+                if hasattr(self, "cpu_sub_combo"):
+                    self._insert_combo_item(self.cpu_sub_combo, val, preset_key="cpu")
+            else:
+                if hasattr(self, "home_cpu_combo"):
+                    self._revert_combo(self.home_cpu_combo, curr)
+                if hasattr(self, "cpu_sub_combo"):
+                    self._revert_combo(self.cpu_sub_combo, curr)
+                return
+
+        self._syncing = True
         self.config["custom_target"]["cpu_model"] = val
         save_config(self.config)
 
@@ -1524,8 +1620,25 @@ class MainWindow(QMainWindow):
     def sync_gpu(self, val, source=None):
         if self._syncing or not val:
             return
-        self._syncing = True
         val = str(val).strip()
+
+        if val.startswith("✏️ 自定义"):
+            curr = self.config["custom_target"].get("gpu_model", "NVIDIA GeForce RTX 5090")
+            new_text, ok = QInputDialog.getText(self, "自定义 GPU 显卡型号", "请输入自定义的显卡完整型号名称:", text=curr)
+            if ok and new_text.strip():
+                val = new_text.strip()
+                if hasattr(self, "home_gpu_combo"):
+                    self._insert_combo_item(self.home_gpu_combo, val, preset_key="gpu")
+                if hasattr(self, "gpu_sub_combo"):
+                    self._insert_combo_item(self.gpu_sub_combo, val, preset_key="gpu")
+            else:
+                if hasattr(self, "home_gpu_combo"):
+                    self._revert_combo(self.home_gpu_combo, curr)
+                if hasattr(self, "gpu_sub_combo"):
+                    self._revert_combo(self.gpu_sub_combo, curr)
+                return
+
+        self._syncing = True
         self.config["custom_target"]["gpu_model"] = val
         save_config(self.config)
 
@@ -1544,8 +1657,25 @@ class MainWindow(QMainWindow):
     def sync_disk(self, val, source=None):
         if self._syncing or not val:
             return
-        self._syncing = True
         val = str(val).strip()
+
+        if val.startswith("✏️ 自定义"):
+            curr = self.config["custom_target"].get("disk_model", "Samsung SSD 990 PRO 2TB")
+            new_text, ok = QInputDialog.getText(self, "自定义固态硬盘型号", "请输入自定义硬盘完整型号名称:", text=curr)
+            if ok and new_text.strip():
+                val = new_text.strip()
+                if hasattr(self, "home_disk_combo"):
+                    self._insert_combo_item(self.home_disk_combo, val, preset_key="disk")
+                if hasattr(self, "disk_sub_combo"):
+                    self._insert_combo_item(self.disk_sub_combo, val, preset_key="disk")
+            else:
+                if hasattr(self, "home_disk_combo"):
+                    self._revert_combo(self.home_disk_combo, curr)
+                if hasattr(self, "disk_sub_combo"):
+                    self._revert_combo(self.disk_sub_combo, curr)
+                return
+
+        self._syncing = True
         self.config["custom_target"]["disk_model"] = val
         save_config(self.config)
 
@@ -1565,6 +1695,30 @@ class MainWindow(QMainWindow):
         if self._syncing or not text:
             return
         text = str(text).strip()
+
+        curr_vendor = self.config["custom_target"].get("motherboard_vendor", "")
+        curr_product = self.config["custom_target"].get("motherboard_product", "")
+        curr_board = f"{curr_vendor} {curr_product}".strip()
+
+        if text.startswith("✏️ 自定义"):
+            new_text, ok = QInputDialog.getText(
+                self, "自定义主板厂商与型号",
+                "请输入自定义主板完整名称 (格式如: ASUSTeK COMPUTER INC. ROG MAXIMUS Z790 HERO):",
+                text=curr_board
+            )
+            if ok and new_text.strip():
+                text = new_text.strip()
+                if hasattr(self, "home_board_combo"):
+                    self._insert_combo_item(self.home_board_combo, text)
+                if hasattr(self, "board_sub_combo"):
+                    self._insert_combo_item(self.board_sub_combo, text)
+            else:
+                if hasattr(self, "home_board_combo"):
+                    self._revert_combo(self.home_board_combo, curr_board)
+                if hasattr(self, "board_sub_combo"):
+                    self._revert_combo(self.board_sub_combo, curr_board)
+                return
+
         matched = False
         for b in self.config["presets"]["motherboard"]:
             if f"{b['vendor']} {b['product']}".strip() == text:
@@ -1574,9 +1728,13 @@ class MainWindow(QMainWindow):
         if not matched:
             parts = text.split(" ", 1)
             if len(parts) == 2:
-                self.sync_board(parts[0], parts[1], source=source)
+                v, p = parts[0], parts[1]
             else:
-                self.sync_board("", text, source=source)
+                v, p = "", text
+            exists = any(b.get("vendor") == v and b.get("product") == p for b in self.config["presets"]["motherboard"])
+            if not exists:
+                self.config["presets"]["motherboard"].append({"vendor": v, "product": p})
+            self.sync_board(v, p, source=source)
 
     def on_board_inputs_edited(self, source=None):
         if self._syncing:
@@ -1623,13 +1781,96 @@ class MainWindow(QMainWindow):
         self._syncing = False
 
     def on_vram_changed(self, text):
+        if not text:
+            return
+        text = str(text).strip()
+        curr_vram = self.config["custom_target"].get("gpu_vram_gb", 24)
+
+        if text.startswith("✏️ 自定义"):
+            new_text, ok = QInputDialog.getText(
+                self, "自定义独立显存容量",
+                "请输入目标显存大小 (单位: GB，如 32、48 或 64):",
+                text=str(curr_vram)
+            )
+            if ok and new_text.strip():
+                import re
+                m = re.search(r"(\d+)", new_text)
+                gb_val = int(m.group(1)) if m else curr_vram
+                val_str = f"{gb_val} GB"
+                if hasattr(self, "vram_sub_combo"):
+                    self._insert_combo_item(self.vram_sub_combo, val_str, preset_key="vram")
+                    self.vram_sub_combo.blockSignals(True)
+                    self.vram_sub_combo.setCurrentText(val_str)
+                    self.vram_sub_combo.blockSignals(False)
+                self.config["custom_target"]["gpu_vram_gb"] = gb_val
+                save_config(self.config)
+            else:
+                if hasattr(self, "vram_sub_combo"):
+                    self._revert_combo(self.vram_sub_combo, f"{curr_vram} GB")
+            return
+
         import re
         m = re.search(r"(\d+)\s*GB", text)
         if m:
             self.config["custom_target"]["gpu_vram_gb"] = int(m.group(1))
             save_config(self.config)
 
+    def on_mem_vendor_changed(self, text):
+        if not text:
+            return
+        text = str(text).strip()
+        curr_vendor = self.config["custom_target"].get("memory_vendor", "Corsair")
+
+        if text.startswith("✏️ 自定义"):
+            new_text, ok = QInputDialog.getText(
+                self, "自定义内存品牌 / 颗粒厂商",
+                "请输入自定义内存品牌厂商 (如 Kingston、G.Skill、Corsair、Crucial):",
+                text=curr_vendor
+            )
+            if ok and new_text.strip():
+                val = new_text.strip()
+                if hasattr(self, "mem_vendor_input"):
+                    self._insert_combo_item(self.mem_vendor_input, val, preset_key="memory_vendor")
+                    self.mem_vendor_input.blockSignals(True)
+                    self.mem_vendor_input.setCurrentText(val)
+                    self.mem_vendor_input.blockSignals(False)
+                self.update_target_field("memory_vendor", val)
+            else:
+                if hasattr(self, "mem_vendor_input"):
+                    self._revert_combo(self.mem_vendor_input, curr_vendor)
+            return
+
+        self.update_target_field("memory_vendor", text)
+
     def on_mem_size_changed(self, text):
+        if not text:
+            return
+        text = str(text).strip()
+        curr_size = self.config["custom_target"].get("memory_size_gb", 64)
+
+        if text.startswith("✏️ 自定义"):
+            new_text, ok = QInputDialog.getText(
+                self, "自定义内存容量",
+                "请输入自定义内存容量 (单位: GB，如 96 或 128):",
+                text=str(curr_size)
+            )
+            if ok and new_text.strip():
+                import re
+                m = re.search(r"(\d+)", new_text)
+                gb_val = int(m.group(1)) if m else curr_size
+                val_str = f"{gb_val} GB"
+                if hasattr(self, "mem_size_input"):
+                    self._insert_combo_item(self.mem_size_input, val_str, preset_key="memory_size")
+                    self.mem_size_input.blockSignals(True)
+                    self.mem_size_input.setCurrentText(val_str)
+                    self.mem_size_input.blockSignals(False)
+                self.config["custom_target"]["memory_size_gb"] = gb_val
+                save_config(self.config)
+            else:
+                if hasattr(self, "mem_size_input"):
+                    self._revert_combo(self.mem_size_input, f"{curr_size} GB")
+            return
+
         import re
         m = re.search(r"(\d+)\s*GB", text)
         if m:
@@ -1637,6 +1878,34 @@ class MainWindow(QMainWindow):
             save_config(self.config)
 
     def on_mem_clock_changed(self, text):
+        if not text:
+            return
+        text = str(text).strip()
+        curr_clock = self.config["custom_target"].get("memory_clock_mhz", 7200)
+
+        if text.startswith("✏️ 自定义"):
+            new_text, ok = QInputDialog.getText(
+                self, "自定义内存工作频率",
+                "请输入自定义内存工作频率 (单位: MHz，如 8000 或 8400):",
+                text=str(curr_clock)
+            )
+            if ok and new_text.strip():
+                import re
+                m = re.search(r"(\d+)", new_text)
+                mhz_val = int(m.group(1)) if m else curr_clock
+                val_str = f"{mhz_val} MHz"
+                if hasattr(self, "mem_clock_input"):
+                    self._insert_combo_item(self.mem_clock_input, val_str, preset_key="memory_clock")
+                    self.mem_clock_input.blockSignals(True)
+                    self.mem_clock_input.setCurrentText(val_str)
+                    self.mem_clock_input.blockSignals(False)
+                self.config["custom_target"]["memory_clock_mhz"] = mhz_val
+                save_config(self.config)
+            else:
+                if hasattr(self, "mem_clock_input"):
+                    self._revert_combo(self.mem_clock_input, f"{curr_clock} MHz")
+            return
+
         import re
         m = re.search(r"(\d+)", text)
         if m:
