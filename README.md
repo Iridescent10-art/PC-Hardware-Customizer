@@ -71,8 +71,8 @@
 ### 方式二：通过 Python 源码运行
 ```bash
 # 1. 克隆本仓库
-git clone https://github.com/Iridescent10-art/Hardware-Customizer.git
-cd Hardware-Customizer
+git clone https://github.com/Iridescent10-art/PC-Hardware-Customizer.git
+cd PC-Hardware-Customizer
 
 # 2. 安装依赖
 pip install PyQt6
