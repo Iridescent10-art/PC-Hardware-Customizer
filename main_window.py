@@ -57,11 +57,30 @@ def ensure_down_arrow_icon():
             img.save(arrow_p, "PNG")
         except Exception:
             pass
+
+    arrow_light_p = os.path.join(ASSETS_DIR, "down_arrow_light.png")
+    if not os.path.exists(arrow_light_p):
+        try:
+            from PySide6.QtGui import QImage, QPainter, QPen, QColor
+            from PySide6.QtCore import Qt
+            img = QImage(24, 24, QImage.Format_ARGB32)
+            img.fill(Qt.transparent)
+            painter = QPainter(img)
+            painter.setRenderHint(QPainter.Antialiasing, True)
+            pen = QPen(QColor("#CBD5E1"), 2.2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+            painter.setPen(pen)
+            painter.drawLine(7, 10, 12, 15)
+            painter.drawLine(12, 15, 17, 10)
+            painter.end()
+            img.save(arrow_light_p, "PNG")
+        except Exception:
+            pass
     return arrow_p
 
 
 ensure_down_arrow_icon()
 ARROW_ICON_PATH = os.path.join(ASSETS_DIR, "down_arrow.png").replace("\\", "/")
+ARROW_ICON_LIGHT_PATH = os.path.join(ASSETS_DIR, "down_arrow_light.png").replace("\\", "/")
 
 
 CPU_BACKUP_FILE = r"C:\CPU_Backup.cfg"
@@ -607,9 +626,9 @@ def execute_hardware_restore():
 
 
 # ==========================================
-# 现代浅色卡片风格 QSS
+# 现代浅色卡片风格 QSS (Light Mode)
 # ==========================================
-STYLE_SHEET = """
+LIGHT_STYLE_SHEET = """
 QMainWindow {
     background: transparent;
 }
@@ -639,6 +658,11 @@ QLabel#BrandSubtitle {
     font-size: 11px;
 }
 
+QFrame#SidebarSep {
+    color: #E2E8F0;
+    margin-bottom: 8px;
+}
+
 /* 侧边栏导航按钮 (仿参考图的圆角胶囊) */
 QPushButton.NavButton {
     background-color: transparent;
@@ -659,6 +683,53 @@ QPushButton.NavButton:hover {
 QPushButton.NavButton:checked {
     background-color: #2B85FF;
     color: #FFFFFF;
+}
+
+/* 侧边栏底部状态微标 */
+QFrame#SidebarStatusBox {
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+QLabel#SidebarVerLbl {
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+QLabel#SidebarHookLbl {
+    color: #10B981;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* 顶部状态条与模式切换按钮 */
+QLabel#StatusBanner {
+    color: #059669;
+    background-color: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#ThemeToggleBtn {
+    background-color: #FFFFFF;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#ThemeToggleBtn:hover {
+    background-color: #F1F5F9;
+    border-color: #94A3B8;
+    color: #1E293B;
 }
 
 /* 顶部 Hero 卡片 */
@@ -684,7 +755,6 @@ QLabel#HeroDesc {
     color: #64748B;
     font-size: 13px;
 }
-
 
 /* 功能卡片 (2x2 网格) */
 QFrame.GridCard {
@@ -738,6 +808,49 @@ QLabel.CardBadgeTeal {
     font-size: 18px;
     font-weight: bold;
     qproperty-alignment: AlignCenter;
+}
+
+/* 表单与通用标签 */
+QLabel {
+    color: #1E293B;
+    font-size: 13px;
+}
+
+QLabel.RealHardwareBadge {
+    color: #64748B;
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+}
+
+QLabel.DescLabel {
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+QLabel.FormHeaderLabel {
+    color: #1E293B;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QLabel#SnapshotLabel {
+    color: #64748B;
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: Consolas, monospace;
+    font-size: 12px;
+}
+
+QCheckBox {
+    color: #1E293B;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 /* 下拉框 ComboBox */
@@ -849,6 +962,20 @@ QLineEdit:focus {
     background-color: #FFFFFF;
 }
 
+QPushButton.OutlineBtn {
+    background-color: #F1F5F9;
+    color: #1E293B;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton.OutlineBtn:hover {
+    background-color: #E2E8F0;
+}
+
 /* 卡片内部操作按钮 */
 QPushButton.CardActionBlue {
     background-color: #2B85FF;
@@ -907,6 +1034,16 @@ QPushButton.CardActionTeal:hover {
 }
 
 /* 底部操作主按钮 */
+QLabel#BottomStatusPill {
+    color: #475569;
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
 QPushButton#ApplyButton {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #2B85FF, stop:1 #1D70E6);
     color: #FFFFFF;
@@ -975,11 +1112,500 @@ QPushButton#WindowCloseBtn:hover {
 }
 """
 
+# ==========================================
+# 现代暗黑卡片风格 QSS (Dark Mode)
+# ==========================================
+DARK_STYLE_SHEET = """
+QMainWindow {
+    background: transparent;
+}
+
+QWidget#CentralWidget {
+    background-color: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 14px;
+}
+
+/* 左侧边栏 */
+QFrame#Sidebar {
+    background-color: #1E293B;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+    border-right: 1px solid #334155;
+}
+
+QLabel#BrandTitle {
+    color: #F8FAFC;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+QLabel#BrandSubtitle {
+    color: #94A3B8;
+    font-size: 11px;
+}
+
+QFrame#SidebarSep {
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+/* 侧边栏导航按钮 */
+QPushButton.NavButton {
+    background-color: transparent;
+    color: #94A3B8;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+}
+
+QPushButton.NavButton:hover {
+    background-color: #334155;
+    color: #F8FAFC;
+}
+
+QPushButton.NavButton:checked {
+    background-color: #3B82F6;
+    color: #FFFFFF;
+}
+
+/* 侧边栏底部状态微标 */
+QFrame#SidebarStatusBox {
+    background-color: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+QLabel#SidebarVerLbl {
+    color: #94A3B8;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+QLabel#SidebarHookLbl {
+    color: #34D399;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* 顶部状态条与模式切换按钮 */
+QLabel#StatusBanner {
+    color: #34D399;
+    background-color: #064E3B;
+    border: 1px solid #059669;
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#ThemeToggleBtn {
+    background-color: #1E293B;
+    color: #F1F5F9;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#ThemeToggleBtn:hover {
+    background-color: #334155;
+    border-color: #64748B;
+    color: #FFFFFF;
+}
+
+/* 顶部 Hero 卡片 */
+QFrame#HeroCard {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #1E293B, stop:1 #0F172A);
+    border: 1px solid #334155;
+    border-radius: 18px;
+}
+
+QLabel#HeroTitleMain {
+    color: #60A5FA;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+QLabel#HeroTitleSub {
+    color: #F8FAFC;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+QLabel#HeroDesc {
+    color: #94A3B8;
+    font-size: 13px;
+}
+
+/* 功能卡片 (2x2 网格) */
+QFrame.GridCard {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 18px;
+}
+
+QLabel.CardTitle {
+    color: #F8FAFC;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+QLabel.CardSubtitle {
+    color: #94A3B8;
+    font-size: 12px;
+}
+
+QLabel.CardBadgeBlue {
+    background-color: #1E3A8A;
+    color: #93C5FD;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    qproperty-alignment: AlignCenter;
+}
+
+QLabel.CardBadgePurple {
+    background-color: #4C1D95;
+    color: #C4B5FD;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    qproperty-alignment: AlignCenter;
+}
+
+QLabel.CardBadgeOrange {
+    background-color: #7C2D12;
+    color: #FDBA74;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    qproperty-alignment: AlignCenter;
+}
+
+QLabel.CardBadgeTeal {
+    background-color: #134E4A;
+    color: #5EEAD4;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    qproperty-alignment: AlignCenter;
+}
+
+/* 表单与通用标签 */
+QLabel {
+    color: #E2E8F0;
+    font-size: 13px;
+}
+
+QLabel.RealHardwareBadge {
+    color: #94A3B8;
+    background-color: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+}
+
+QLabel.DescLabel {
+    color: #94A3B8;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+QLabel.FormHeaderLabel {
+    color: #F8FAFC;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QLabel#SnapshotLabel {
+    color: #94A3B8;
+    background-color: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: Consolas, monospace;
+    font-size: 12px;
+}
+
+QCheckBox {
+    color: #F8FAFC;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* 下拉框 ComboBox */
+QComboBox {
+    background-color: #0F172A;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    padding: 8px 32px 8px 12px;
+    font-size: 13px;
+    color: #F8FAFC;
+}
+
+QComboBox:hover {
+    border: 1px solid #60A5FA;
+    background-color: #1E293B;
+}
+
+QComboBox:focus {
+    border: 1px solid #3B82F6;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 28px;
+    border: none;
+    background: transparent;
+}
+
+QComboBox::down-arrow {
+    image: url("__ARROW_ICON_LIGHT_PATH__");
+    width: 14px;
+    height: 14px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    selection-background-color: #1E3A8A;
+    selection-color: #93C5FD;
+    color: #F8FAFC;
+    padding: 4px;
+}
+
+QComboBox QAbstractItemView::item {
+    min-height: 28px;
+    padding: 2px 8px;
+}
+
+/* 自定义消息弹窗与通用对话框样式 (QMessageBox & QDialog) */
+QDialog, QMessageBox {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 12px;
+}
+
+QDialog QLabel, QMessageBox QLabel {
+    color: #F8FAFC;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+QMessageBox QLabel#qt_msgbox_label {
+    color: #F8FAFC;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+QInputDialog QLabel {
+    color: #F8FAFC;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QInputDialog QLineEdit {
+    min-width: 400px;
+    font-size: 13px;
+    color: #F8FAFC;
+}
+
+QDialogButtonBox QPushButton, QMessageBox QPushButton {
+    background-color: #3B82F6;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 70px;
+}
+
+QDialogButtonBox QPushButton:hover, QMessageBox QPushButton:hover {
+    background-color: #2563EB;
+}
+
+/* 输入框 */
+QLineEdit {
+    background-color: #0F172A;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #F8FAFC;
+}
+
+QLineEdit:focus {
+    border: 1px solid #3B82F6;
+    background-color: #1E293B;
+}
+
+QPushButton.OutlineBtn {
+    background-color: #334155;
+    color: #F8FAFC;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton.OutlineBtn:hover {
+    background-color: #475569;
+}
+
+/* 卡片内部操作按钮 */
+QPushButton.CardActionBlue {
+    background-color: #3B82F6;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton.CardActionBlue:hover {
+    background-color: #2563EB;
+}
+
+QPushButton.CardActionPurple {
+    background-color: #581C87;
+    color: #E9D5FF;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton.CardActionPurple:hover {
+    background-color: #6B21A8;
+}
+
+QPushButton.CardActionOrange {
+    background-color: #7C2D12;
+    color: #FED7AA;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton.CardActionOrange:hover {
+    background-color: #9A3412;
+}
+
+QPushButton.CardActionTeal {
+    background-color: #134E4A;
+    color: #99F6E4;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton.CardActionTeal:hover {
+    background-color: #115E59;
+}
+
+/* 底部操作主按钮 */
+QLabel#BottomStatusPill {
+    color: #94A3B8;
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+QPushButton#ApplyButton {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3B82F6, stop:1 #2563EB);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+QPushButton#ApplyButton:hover {
+    background: #1D4ED8;
+}
+
+QPushButton#RestoreButton {
+    background-color: #1E293B;
+    color: #94A3B8;
+    border: 1px solid #475569;
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+QPushButton#RestoreButton:hover {
+    background-color: #334155;
+    color: #F87171;
+    border-color: #EF4444;
+}
+
+/* 顶部自定义窗口控制按钮 (Windows 11 Fluent 风格) */
+QPushButton.WindowControl {
+    background-color: transparent;
+    color: #94A3B8;
+    border: none;
+    border-radius: 6px;
+    min-width: 34px;
+    max-width: 34px;
+    min-height: 28px;
+    max-height: 28px;
+    font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets';
+    font-size: 10px;
+}
+
+QPushButton.WindowControl:hover {
+    background-color: #334155;
+    color: #FFFFFF;
+}
+
+QPushButton#WindowCloseBtn {
+    background-color: transparent;
+    color: #94A3B8;
+    border: none;
+    border-radius: 6px;
+    min-width: 34px;
+    max-width: 34px;
+    min-height: 28px;
+    max-height: 28px;
+    font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets';
+    font-size: 10px;
+}
+
+QPushButton#WindowCloseBtn:hover {
+    background-color: #EF4444;
+    color: #FFFFFF;
+}
+"""
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.config = load_config()
+        self.is_dark_mode = self.config.get("theme", "light") == "dark"
         self._syncing = False
         self._drag_pos = None
         self.init_ui()
@@ -999,8 +1625,6 @@ class MainWindow(QMainWindow):
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
 
-        self.setStyleSheet(STYLE_SHEET.replace("__ARROW_ICON_PATH__", ARROW_ICON_PATH))
-
         # 2. 主视窗与布局
         self.central_widget = QWidget(self)
         self.central_widget.setObjectName("CentralWidget")
@@ -1017,6 +1641,36 @@ class MainWindow(QMainWindow):
         # 4. 创建右侧主功能工作区 (Main Content)
         content_area = self.create_content_area()
         root_layout.addWidget(content_area)
+
+        # 5. 应用初始主题 (白天 / 黑夜模式)
+        self.apply_theme()
+
+    def toggle_theme(self):
+        self.is_dark_mode = not self.is_dark_mode
+        self.config["theme"] = "dark" if self.is_dark_mode else "light"
+        save_config(self.config)
+        self.apply_theme()
+
+    def apply_theme(self):
+        if self.is_dark_mode:
+            sheet = DARK_STYLE_SHEET.replace("__ARROW_ICON_LIGHT_PATH__", ARROW_ICON_LIGHT_PATH)
+        else:
+            sheet = LIGHT_STYLE_SHEET.replace("__ARROW_ICON_PATH__", ARROW_ICON_PATH)
+        self.setStyleSheet(sheet)
+
+        if hasattr(self, "btn_theme"):
+            self.btn_theme.setText("☀️ 白天模式" if self.is_dark_mode else "🌙 黑夜模式")
+            self.btn_theme.setToolTip("切换为浅色白天模式" if self.is_dark_mode else "切换为暗色黑夜模式")
+
+        bg_color = "#0F172A" if self.is_dark_mode else "#F0F4FA"
+        border_color = "#334155" if self.is_dark_mode else "#D6E6FE"
+        if self.isMaximized():
+            self.central_widget.setStyleSheet(f"#CentralWidget {{ background-color: {bg_color}; border: none; border-radius: 0px; }}")
+        else:
+            self.central_widget.setStyleSheet(f"#CentralWidget {{ background-color: {bg_color}; border: 1px solid {border_color}; border-radius: 14px; }}")
+
+        if hasattr(self, "heybox_path_input"):
+            self.update_heybox_path_status_ui(self.heybox_path_input.text().strip())
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and event.position().y() <= 55:
@@ -1045,18 +1699,20 @@ class MainWindow(QMainWindow):
             super().mouseDoubleClickEvent(event)
 
     def toggle_maximized(self):
+        bg_color = "#0F172A" if getattr(self, "is_dark_mode", False) else "#F0F4FA"
+        border_color = "#334155" if getattr(self, "is_dark_mode", False) else "#D6E6FE"
         if self.isMaximized():
             self.showNormal()
             if hasattr(self, "btn_max"):
                 self.btn_max.setText("\uE922")
                 self.btn_max.setToolTip("最大化")
-            self.central_widget.setStyleSheet("#CentralWidget { background-color: #F0F4FA; border: 1px solid #D6E6FE; border-radius: 14px; }")
+            self.central_widget.setStyleSheet(f"#CentralWidget {{ background-color: {bg_color}; border: 1px solid {border_color}; border-radius: 14px; }}")
         else:
             self.showMaximized()
             if hasattr(self, "btn_max"):
                 self.btn_max.setText("\uE923")
                 self.btn_max.setToolTip("还原")
-            self.central_widget.setStyleSheet("#CentralWidget { background-color: #F0F4FA; border: none; border-radius: 0px; }")
+            self.central_widget.setStyleSheet(f"#CentralWidget {{ background-color: {bg_color}; border: none; border-radius: 0px; }}")
 
     def create_sidebar(self):
         sidebar = QFrame()
@@ -1093,7 +1749,7 @@ class MainWindow(QMainWindow):
         # 分割线
         sep = QFrame()
         sep.setFrameShape(QFrame.HLine)
-        sep.setStyleSheet("color: #E2E8F0; margin-bottom: 8px;")
+        sep.setObjectName("SidebarSep")
         layout.addWidget(sep)
 
         # 导航项列表
@@ -1121,14 +1777,14 @@ class MainWindow(QMainWindow):
 
         # 底部状态微标
         status_box = QFrame()
-        status_box.setStyleSheet("background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px;")
+        status_box.setObjectName("SidebarStatusBox")
         s_layout = QVBoxLayout(status_box)
         s_layout.setContentsMargins(6, 6, 6, 6)
         s_layout.setSpacing(4)
         ver_lbl = QLabel("当前版本: v2.5.0 Pro")
-        ver_lbl.setStyleSheet("color: #64748B; font-size: 11px; font-weight: 600;")
+        ver_lbl.setObjectName("SidebarVerLbl")
         hook_lbl = QLabel("● 拦截器运行中")
-        hook_lbl.setStyleSheet("color: #10B981; font-size: 11px; font-weight: 700;")
+        hook_lbl.setObjectName("SidebarHookLbl")
         s_layout.addWidget(ver_lbl)
         s_layout.addWidget(hook_lbl)
         layout.addWidget(status_box)
@@ -1147,10 +1803,16 @@ class MainWindow(QMainWindow):
         topbar.setContentsMargins(0, 0, 0, 2)
         
         status_banner = QLabel(" 实时硬件穿透环境就绪 | 小黑盒 SSS 评级注入已激活")
-        status_banner.setStyleSheet("color: #059669; background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 6px 14px; font-size: 12px; font-weight: 600;")
+        status_banner.setObjectName("StatusBanner")
         topbar.addWidget(status_banner)
         topbar.addStretch()
 
+        # 主题切换按钮 (白天 / 黑夜模式)
+        self.btn_theme = QPushButton()
+        self.btn_theme.setObjectName("ThemeToggleBtn")
+        self.btn_theme.setCursor(Qt.PointingHandCursor)
+        self.btn_theme.clicked.connect(self.toggle_theme)
+        topbar.addWidget(self.btn_theme)
 
         # 窗口控制按钮 (Windows 11 Fluent 矢量图标: 最小化、最大化/还原、关闭)
         self.btn_min = QPushButton("\uE921")
@@ -1190,7 +1852,7 @@ class MainWindow(QMainWindow):
         bottom_bar.setContentsMargins(0, 4, 0, 0)
 
         status_pill = QLabel("● 状态: 就绪 | 配置文件: C:\\Users\\Public\\Hardware_Config.json (双向热同步)")
-        status_pill.setStyleSheet("color: #475569; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 7px 12px; font-size: 11px; font-weight: 500;")
+        status_pill.setObjectName("BottomStatusPill")
         bottom_bar.addWidget(status_pill)
         bottom_bar.addStretch()
 
@@ -1395,7 +2057,7 @@ class MainWindow(QMainWindow):
 
         c_layout.addWidget(QLabel("检测出厂物理真实 CPU:"))
         real_cpu_lbl = QLabel(self.config["current_hardware"].get("detected_cpu", DEFAULT_REAL_CPU))
-        real_cpu_lbl.setStyleSheet("color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px;")
+        real_cpu_lbl.setProperty("class", "RealHardwareBadge")
         c_layout.addWidget(real_cpu_lbl)
 
         c_layout.addStretch()
@@ -1440,7 +2102,7 @@ class MainWindow(QMainWindow):
 
         c_layout.addWidget(QLabel("出厂物理真实显卡:"))
         real_gpu_lbl = QLabel(self.config["current_hardware"].get("detected_gpu", DEFAULT_REAL_GPU))
-        real_gpu_lbl.setStyleSheet("color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px;")
+        real_gpu_lbl.setProperty("class", "RealHardwareBadge")
         c_layout.addWidget(real_gpu_lbl)
 
         c_layout.addStretch()
@@ -1543,7 +2205,7 @@ class MainWindow(QMainWindow):
 
         c_layout.addWidget(QLabel("出厂物理真实硬盘:"))
         real_disk_lbl = QLabel(self.config["current_hardware"].get("disk_model", DEFAULT_REAL_DISK_MODEL))
-        real_disk_lbl.setStyleSheet("color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px;")
+        real_disk_lbl.setProperty("class", "RealHardwareBadge")
         c_layout.addWidget(real_disk_lbl)
 
         c_layout.addStretch()
@@ -1572,7 +2234,7 @@ class MainWindow(QMainWindow):
             "● 顶部评级：强制突破云端历史缓存，直接呈递 SSS 顶级神级评分与 99.9% 玩家超越率。\n"
             "● 状态感知：自动监控小黑盒运行，并在每次配置变更时无感同步。"
         )
-        desc.setStyleSheet("color: #475569; font-size: 13px; line-height: 1.6;")
+        desc.setProperty("class", "DescLabel")
         c_layout.addWidget(desc)
 
         # 路径探测与自定义配置区域 (支持跨盘符全盘自动探测与手动浏览选择)
@@ -1581,7 +2243,7 @@ class MainWindow(QMainWindow):
 
         path_title_row = QHBoxLayout()
         path_title = QLabel("小黑盒加速器安装根目录 (支持跨盘符全盘自动探测，或点击浏览手动指定):")
-        path_title.setStyleSheet("color: #1E293B; font-size: 13px; font-weight: 600;")
+        path_title.setProperty("class", "FormHeaderLabel")
         path_title_row.addWidget(path_title)
         path_title_row.addStretch()
         path_box.addLayout(path_title_row)
@@ -1596,12 +2258,12 @@ class MainWindow(QMainWindow):
         path_input_row.addWidget(self.heybox_path_input, 1)
 
         btn_browse = QPushButton("📂 浏览路径...")
-        btn_browse.setStyleSheet("background-color: #F1F5F9; color: #1E293B; border: 1px solid #CBD5E1; border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 600;")
+        btn_browse.setProperty("class", "OutlineBtn")
         btn_browse.clicked.connect(self.browse_heybox_path)
         path_input_row.addWidget(btn_browse)
 
         btn_redetect = QPushButton("🔍 重新探测")
-        btn_redetect.setStyleSheet("background-color: #F1F5F9; color: #1E293B; border: 1px solid #CBD5E1; border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 600;")
+        btn_redetect.setProperty("class", "OutlineBtn")
         btn_redetect.clicked.connect(self.redetect_heybox_path)
         path_input_row.addWidget(btn_redetect)
 
@@ -1648,7 +2310,6 @@ class MainWindow(QMainWindow):
         self.chk_startup = QCheckBox("启用开机自启静默修复计划任务 (防止 Windows 自动刷新 CentralProcessor 注册表)")
         self.chk_startup.setChecked(self.config["custom_target"].get("enable_startup_fix", True))
         self.chk_startup.stateChanged.connect(lambda s: self.update_target_field("enable_startup_fix", bool(s)))
-        self.chk_startup.setStyleSheet("color: #1E293B; font-size: 13px; font-weight: 600;")
         c_layout.addWidget(self.chk_startup)
 
         c_layout.addWidget(QLabel("官方硬件出厂快照文件:"))
@@ -1659,7 +2320,7 @@ class MainWindow(QMainWindow):
             f"硬盘快照: {DISK_BACKUP_FILE} ({'已备份' if os.path.exists(DISK_BACKUP_FILE) else '未备份'})",
         ]
         snap_lbl = QLabel("\n".join(snapshots))
-        snap_lbl.setStyleSheet("color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; font-family: Consolas, monospace;")
+        snap_lbl.setObjectName("SnapshotLabel")
         c_layout.addWidget(snap_lbl)
 
         c_layout.addStretch()
@@ -2049,9 +2710,13 @@ class MainWindow(QMainWindow):
     def update_heybox_path_status_ui(self, p):
         if not hasattr(self, "heybox_path_status"):
             return
+        is_dark = getattr(self, "is_dark_mode", False)
         if not p or not os.path.exists(p):
             self.heybox_path_status.setText("● 提示：指定目录不存在，请点击右侧“浏览路径”选择小黑盒加速器文件夹")
-            self.heybox_path_status.setStyleSheet("color: #D97706; background-color: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+            if is_dark:
+                self.heybox_path_status.setStyleSheet("color: #FCD34D; background-color: #78350F; border: 1px solid #B45309; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+            else:
+                self.heybox_path_status.setStyleSheet("color: #D97706; background-color: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
             return
         # 验证核心标志物
         has_exe = os.path.exists(os.path.join(p, "heyboxacc.exe"))
@@ -2060,10 +2725,16 @@ class MainWindow(QMainWindow):
         if has_exe or has_res or len(index_paths) > 0:
             count = len(index_paths)
             self.heybox_path_status.setText(f"● 路径有效：已成功识别小黑盒核心模块 (找到 {count} 个 Electron 拦截入口节点)")
-            self.heybox_path_status.setStyleSheet("color: #059669; background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+            if is_dark:
+                self.heybox_path_status.setStyleSheet("color: #6EE7B7; background-color: #064E3B; border: 1px solid #059669; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+            else:
+                self.heybox_path_status.setStyleSheet("color: #059669; background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
         else:
             self.heybox_path_status.setText("● 警告：该目录下未找到 heyboxacc.exe 或 resources 文件夹，请选择包含主程序的根目录")
-            self.heybox_path_status.setStyleSheet("color: #DC2626; background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+            if is_dark:
+                self.heybox_path_status.setStyleSheet("color: #FCA5A5; background-color: #7F1D1D; border: 1px solid #B91C1C; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
+            else:
+                self.heybox_path_status.setStyleSheet("color: #DC2626; background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;")
 
     def on_heybox_path_changed(self, text):
         p = text.strip()

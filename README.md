@@ -27,14 +27,16 @@
 
 ## ✨ 核心特性 (Features)
 
-- 🎨 **现代化 Fluent 视觉体验**：无边框毛玻璃暗色设计，Windows 11 原生标题栏控件与平滑交互动画。
+- 🎨 **双主题无缝切换 (Light & Dark Theme)**：内置精心调校的 **☀️ 白天模式 (Light Card)** 与 **🌙 黑夜模式 (Deep Slate)**，支持右上角标题栏一键平滑热切换，自动记忆偏好。
 - 🖥️ **全套核心硬件深度定制**：
-  - **处理器 (CPU)**：重写 `CentralProcessor` 所有逻辑核心注册表、ACPI 描述与核心数呈现。
+  - **处理器 (CPU)**：重写 `CentralProcessor` 所有逻辑核心注册表、ACPI 描述与核心数呈现，内置 9850X3D、9950X3D、9950X3D2 等全套顶级芯片及自定义输入。
   - **显卡 (GPU) & 显存 (VRAM)**：DirectX/DXGI 适配器重映射、`Control\Video` 全链路多通道及 `DedicatedVideoMemory` 显存重定义。
-  - **主板 (Motherboard)**：系统 BIOS `BaseBoardManufacturer`、`BaseBoardProduct`、`SystemManufacturer` 与型号定制。
-  - **内存 (RAM)**：品牌、容量（32GB ~ 128GB）及频率（3600MHz ~ 8400MHz）全面自定义。
+  - **主板 (Motherboard)**：系统 BIOS `BaseBoardManufacturer`、`BaseBoardProduct`、`SystemManufacturer` 与型号定制，兼容微星/华硕/七彩虹等品牌前缀。
+  - **内存 (RAM)**：品牌、容量（16GB ~ 128GB）及频率（3600MHz ~ 8400MHz）全面自定义。
   - **硬盘 (SSD/NVMe)**：覆盖底层总线 `Enum\SCSI` 驱动设备与设备管理器 FriendlyName。
-- ⚡ **小黑盒专属 N-API Hook 实时拦截**：自动解包与注入 Electron `app.asar`，内存实时篡改 `getHardwareInfo()` 返回对象，无视物理 NVAPI 通讯限制。
+- ⚡ **小黑盒专属 N-API Hook 实时拦截与跨盘符自适应**：
+  - 支持多级全盘与跨盘符自动探测安装根目录、注册表与正在运行进程嗅探，同时支持手动浏览指定与状态实时自检。
+  - 自动解包与注入 Electron `app.asar`，内存实时篡改 `getHardwareInfo()` 返回对象，强制激活云端 SSS 顶级神级评分与 99.9% 玩家超越率。
 - 🔄 **0 风险一键完全还原**：内置官方出厂真实硬件信息备份与一秒还原机制，随心切换无残留。
 
 ---
