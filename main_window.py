@@ -922,17 +922,101 @@ QComboBox::down-arrow {
 
 QComboBox QAbstractItemView {
     background-color: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    border: 1px solid #CBD5E1;
     border-radius: 8px;
-    selection-background-color: #EFF6FF;
-    selection-color: #2B85FF;
     color: #1E293B;
-    padding: 4px;
+    padding: 6px;
+    min-width: 360px;
+    outline: none;
 }
 
 QComboBox QAbstractItemView::item {
-    min-height: 28px;
-    padding: 2px 8px;
+    min-height: 30px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: #1E293B;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #F1F5F9;
+    color: #2B85FF;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #EFF6FF;
+    color: #2B85FF;
+}
+
+/* 现代半透明纤细滚动条 (Light Mode) */
+QScrollBar:vertical {
+    border: none;
+    background: #F8FAFC;
+    width: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical {
+    background: #CBD5E1;
+    min-height: 25px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #94A3B8;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar:horizontal {
+    border: none;
+    background: #F8FAFC;
+    height: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal {
+    background: #CBD5E1;
+    min-width: 25px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #94A3B8;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* 现代二级菜单与右键菜单 (QMenu) */
+QMenu {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 6px;
+    color: #1E293B;
+    font-size: 13px;
+}
+QMenu::item {
+    padding: 6px 24px 6px 20px;
+    border-radius: 6px;
+    color: #1E293B;
+}
+QMenu::item:selected {
+    background-color: #EFF6FF;
+    color: #2B85FF;
+}
+QMenu::item:disabled {
+    color: #94A3B8;
+}
+QMenu::separator {
+    height: 1px;
+    background: #E2E8F0;
+    margin: 4px 6px;
 }
 
 /* 自定义消息弹窗与通用对话框样式 (QMessageBox & QDialog) */
@@ -961,9 +1045,18 @@ QInputDialog QLabel {
 }
 
 QInputDialog QLineEdit {
-    min-width: 400px;
+    min-width: 420px;
     font-size: 13px;
     color: #1E293B;
+    background-color: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+QInputDialog QLineEdit:focus {
+    border: 1px solid #2B85FF;
+    background-color: #FFFFFF;
 }
 
 QDialogButtonBox QPushButton, QMessageBox QPushButton {
@@ -971,14 +1064,18 @@ QDialogButtonBox QPushButton, QMessageBox QPushButton {
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
-    padding: 7px 20px;
+    padding: 8px 24px;
     font-size: 13px;
     font-weight: 600;
-    min-width: 70px;
+    min-width: 75px;
 }
 
 QDialogButtonBox QPushButton:hover, QMessageBox QPushButton:hover {
     background-color: #1D70E6;
+}
+
+QDialogButtonBox QPushButton:pressed, QMessageBox QPushButton:pressed {
+    background-color: #1557B0;
 }
 
 /* 输入框 */
@@ -1416,15 +1513,99 @@ QComboBox QAbstractItemView {
     background-color: #1E293B;
     border: 1px solid #334155;
     border-radius: 8px;
-    selection-background-color: #1E3A8A;
-    selection-color: #93C5FD;
     color: #F8FAFC;
-    padding: 4px;
+    padding: 6px;
+    min-width: 360px;
+    outline: none;
 }
 
 QComboBox QAbstractItemView::item {
-    min-height: 28px;
-    padding: 2px 8px;
+    min-height: 30px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: #F8FAFC;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #334155;
+    color: #60A5FA;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #2563EB;
+    color: #FFFFFF;
+}
+
+/* 现代半透明纤细滚动条 (Dark Mode) */
+QScrollBar:vertical {
+    border: none;
+    background: #0F172A;
+    width: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical {
+    background: #334155;
+    min-height: 25px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #475569;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar:horizontal {
+    border: none;
+    background: #0F172A;
+    height: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal {
+    background: #334155;
+    min-width: 25px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #475569;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* 现代二级菜单与右键菜单 (QMenu) */
+QMenu {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 6px;
+    color: #F8FAFC;
+    font-size: 13px;
+}
+QMenu::item {
+    padding: 6px 24px 6px 20px;
+    border-radius: 6px;
+    color: #F8FAFC;
+}
+QMenu::item:selected {
+    background-color: #2563EB;
+    color: #FFFFFF;
+}
+QMenu::item:disabled {
+    color: #64748B;
+}
+QMenu::separator {
+    height: 1px;
+    background: #334155;
+    margin: 4px 6px;
 }
 
 /* 自定义消息弹窗与通用对话框样式 (QMessageBox & QDialog) */
@@ -1453,9 +1634,18 @@ QInputDialog QLabel {
 }
 
 QInputDialog QLineEdit {
-    min-width: 400px;
+    min-width: 420px;
     font-size: 13px;
     color: #F8FAFC;
+    background-color: #0F172A;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+QInputDialog QLineEdit:focus {
+    border: 1px solid #3B82F6;
+    background-color: #1E293B;
 }
 
 QDialogButtonBox QPushButton, QMessageBox QPushButton {
@@ -1463,14 +1653,18 @@ QDialogButtonBox QPushButton, QMessageBox QPushButton {
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
-    padding: 7px 20px;
+    padding: 8px 24px;
     font-size: 13px;
     font-weight: 600;
-    min-width: 70px;
+    min-width: 75px;
 }
 
 QDialogButtonBox QPushButton:hover, QMessageBox QPushButton:hover {
     background-color: #2563EB;
+}
+
+QDialogButtonBox QPushButton:pressed, QMessageBox QPushButton:pressed {
+    background-color: #1D4ED8;
 }
 
 /* 输入框 */
@@ -1639,6 +1833,147 @@ QPushButton#WindowCloseBtn:hover {
 """
 
 
+def set_window_theme_titlebar(widget, is_dark=True):
+    r"""
+    通过 Windows DWM API 动态切换原生窗口与二级弹窗标题栏的黑夜/白天模式
+    """
+    try:
+        hwnd = int(widget.winId())
+        val = ctypes.c_int(1 if is_dark else 0)
+        # Windows 10 build 18985+ / Windows 11 (DWMWA_USE_IMMERSIVE_DARK_MODE = 20)
+        res = ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, 20, ctypes.byref(val), ctypes.sizeof(val))
+        if res != 0:
+            # Windows 10 1809~1909 旧版回退 (DWMWA_USE_IMMERSIVE_DARK_MODE = 19)
+            ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, 19, ctypes.byref(val), ctypes.sizeof(val))
+    except Exception:
+        pass
+
+
+class ThemedMessageBox(QMessageBox):
+    r"""
+    深度支持白天/黑夜主题与 Windows 11 DWM 原生暗黑标题栏的自定义消息弹窗
+    """
+    def __init__(self, *args, is_dark=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        parent = self.parent()
+        if is_dark is None:
+            self.is_dark = getattr(parent, "is_dark_mode", False) if parent else False
+        else:
+            self.is_dark = is_dark
+        icon_path = os.path.join(ASSETS_DIR, "app_icon.ico")
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+        self._apply_dialog_theme()
+
+    def _apply_dialog_theme(self):
+        sheet = DARK_STYLE_SHEET.replace("__ARROW_ICON_LIGHT_PATH__", ARROW_ICON_LIGHT_PATH) if self.is_dark else LIGHT_STYLE_SHEET.replace("__ARROW_ICON_PATH__", ARROW_ICON_PATH)
+        self.setStyleSheet(sheet)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        set_window_theme_titlebar(self, self.is_dark)
+
+    @classmethod
+    def information(cls, parent, title, text, buttons=QMessageBox.Ok, default_button=QMessageBox.NoButton):
+        is_dark = getattr(parent, "is_dark_mode", False) if parent else False
+        box = cls(parent, is_dark=is_dark)
+        box.setIcon(QMessageBox.Information)
+        box.setWindowTitle(title)
+        box.setText(text)
+        box.setStandardButtons(buttons)
+        if default_button != QMessageBox.NoButton:
+            box.setDefaultButton(default_button)
+        if box.button(QMessageBox.Ok):
+            box.button(QMessageBox.Ok).setText("确定")
+        return box.exec()
+
+    @classmethod
+    def question(cls, parent, title, text, buttons=QMessageBox.Yes | QMessageBox.No, default_button=QMessageBox.NoButton):
+        is_dark = getattr(parent, "is_dark_mode", False) if parent else False
+        box = cls(parent, is_dark=is_dark)
+        box.setIcon(QMessageBox.Question)
+        box.setWindowTitle(title)
+        box.setText(text)
+        box.setStandardButtons(buttons)
+        if default_button != QMessageBox.NoButton:
+            box.setDefaultButton(default_button)
+        if box.button(QMessageBox.Yes):
+            box.button(QMessageBox.Yes).setText("是 (Yes)")
+        if box.button(QMessageBox.No):
+            box.button(QMessageBox.No).setText("否 (No)")
+        if box.button(QMessageBox.Cancel):
+            box.button(QMessageBox.Cancel).setText("取消")
+        return box.exec()
+
+    @classmethod
+    def warning(cls, parent, title, text, buttons=QMessageBox.Ok, default_button=QMessageBox.NoButton):
+        is_dark = getattr(parent, "is_dark_mode", False) if parent else False
+        box = cls(parent, is_dark=is_dark)
+        box.setIcon(QMessageBox.Warning)
+        box.setWindowTitle(title)
+        box.setText(text)
+        box.setStandardButtons(buttons)
+        if default_button != QMessageBox.NoButton:
+            box.setDefaultButton(default_button)
+        if box.button(QMessageBox.Ok):
+            box.button(QMessageBox.Ok).setText("确定")
+        return box.exec()
+
+
+class ThemedInputDialog(QInputDialog):
+    r"""
+    深度支持白天/黑夜主题与 Windows 11 DWM 原生暗黑标题栏的自定义输入对话框
+    """
+    def __init__(self, *args, is_dark=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        parent = self.parent()
+        if is_dark is None:
+            self.is_dark = getattr(parent, "is_dark_mode", False) if parent else False
+        else:
+            self.is_dark = is_dark
+        icon_path = os.path.join(ASSETS_DIR, "app_icon.ico")
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+        sheet = DARK_STYLE_SHEET.replace("__ARROW_ICON_LIGHT_PATH__", ARROW_ICON_LIGHT_PATH) if self.is_dark else LIGHT_STYLE_SHEET.replace("__ARROW_ICON_PATH__", ARROW_ICON_PATH)
+        self.setStyleSheet(sheet)
+        self.setOkButtonText("确定")
+        self.setCancelButtonText("取消")
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        set_window_theme_titlebar(self, self.is_dark)
+
+    @classmethod
+    def getText(cls, parent, title, label, text=""):
+        is_dark = getattr(parent, "is_dark_mode", False) if parent else False
+        dlg = cls(parent, is_dark=is_dark)
+        dlg.setWindowTitle(title)
+        dlg.setLabelText(label)
+        dlg.setTextValue(text)
+        ok = dlg.exec()
+        return dlg.textValue(), bool(ok)
+
+
+class ThemedComboBox(QComboBox):
+    r"""
+    智能自适应宽度与深度主题支持的下拉框，二级下拉菜单绝不发生截断
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def showPopup(self):
+        # 弹出二级下拉菜单时，确保宽度至少为 360px，完整展示长硬件型号
+        if self.view():
+            self.view().setMinimumWidth(max(self.width(), 360))
+        super().showPopup()
+
+
+# 挂载全局别名，使所有原生调用无缝自动升级为主题兼容组件
+QMessageBox = ThemedMessageBox
+QInputDialog = ThemedInputDialog
+QComboBox = ThemedComboBox
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -1695,6 +2030,11 @@ class MainWindow(QMainWindow):
             sheet = DARK_STYLE_SHEET.replace("__ARROW_ICON_LIGHT_PATH__", ARROW_ICON_LIGHT_PATH)
         else:
             sheet = LIGHT_STYLE_SHEET.replace("__ARROW_ICON_PATH__", ARROW_ICON_PATH)
+        
+        # 1. 深度应用至全局 QApplication 实例，确保所有子窗口、二级下拉菜单、右键菜单、弹出对话框完全统一
+        app = QApplication.instance()
+        if app:
+            app.setStyleSheet(sheet)
         self.setStyleSheet(sheet)
 
         if hasattr(self, "btn_theme"):
