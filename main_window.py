@@ -11,14 +11,43 @@ import json
 import ctypes
 import winreg
 import subprocess
+
+# ==========================================
+# 操作系统级与 Qt 高分屏 (High-DPI) 与文字清晰度底层配置
+# 必须在导入或创建任何 UI 组件之前初始化
+# ==========================================
+try:
+    # 启用 Windows Per-Monitor DPI Aware V2 硬件级感知 (防位图模糊缩放)
+    ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
+except Exception:
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    except Exception:
+        try:
+            ctypes.windll.user32.SetProcessDPIAware()
+        except Exception:
+            pass
+
+# 启用 Qt 无损物理像素与亚像素平滑渲染
+os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
+os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+os.environ["QT_SCALE_FACTOR_ROUNDING_POLICY"] = "PassThrough"
+
 from PySide6.QtCore import Qt, QSize, QPoint, QEvent
-from PySide6.QtGui import QIcon, QPixmap, QFont, QColor
+from PySide6.QtGui import QIcon, QPixmap, QFont, QColor, QGuiApplication
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox,
     QStackedWidget, QFrame, QScrollArea, QMessageBox, QGraphicsDropShadowEffect,
     QInputDialog, QFileDialog
 )
+
+try:
+    QGuiApplication.setHighDpiScaleFactorRoundingPolicy(
+        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+    )
+except Exception:
+    pass
 
 # 基础目录与常量
 if getattr(sys, "frozen", False):
@@ -629,6 +658,11 @@ def execute_hardware_restore():
 # 现代浅色卡片风格 QSS (Light Mode)
 # ==========================================
 LIGHT_STYLE_SHEET = """
+/* 全局控件高清晰度字体渲染与字体栈 */
+QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QDialog, QMessageBox {
+    font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", sans-serif;
+}
+
 QMainWindow {
     background: transparent;
 }
@@ -1116,6 +1150,11 @@ QPushButton#WindowCloseBtn:hover {
 # 现代暗黑卡片风格 QSS (Dark Mode)
 # ==========================================
 DARK_STYLE_SHEET = """
+/* 全局控件高清晰度字体渲染与字体栈 */
+QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QDialog, QMessageBox {
+    font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", sans-serif;
+}
+
 QMainWindow {
     background: transparent;
 }
@@ -2813,11 +2852,26 @@ class MainWindow(QMainWindow):
 
 
 def main():
+    # 再次确保主线程处于 Per-Monitor DPI Aware V2 模式
+    try:
+        ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
+    except Exception:
+        pass
+
+    try:
+        QGuiApplication.setHighDpiScaleFactorRoundingPolicy(
+            Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+        )
+    except Exception:
+        pass
+
     app = QApplication(sys.argv)
     
-    # 启用高 DPI 缩放与抗锯齿字体
-    font = QFont("Microsoft YaHei UI", 9)
-    app.setFont(font)
+    # 启用高清晰度 ClearType 亚像素抗锯齿与精准网格对齐字体引擎
+    app_font = QFont("Microsoft YaHei UI", 10)
+    app_font.setStyleStrategy(QFont.PreferAntialias | QFont.PreferQuality)
+    app_font.setHintingPreference(QFont.PreferFullHinting)
+    app.setFont(app_font)
 
     # 外部与任务栏图标关联 (Windows AppID)
     try:
